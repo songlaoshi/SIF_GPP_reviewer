@@ -33,6 +33,12 @@ class VI_container(object):
 	CIgreen = np.array([])
 	CVI = np.array([])
 	SR = np.array([])
+	Rblue=np.array([])
+	Rgreen=np.array([])
+	Rred=np.array([])
+	Rnir=np.array([])
+	Rrededge=np.array([])
+
 
 
 def get_vegetation_indices(wl, ref):
@@ -81,6 +87,11 @@ def get_vegetation_indices(wl, ref):
 	setup.CIgreen = Rnir / Rgreen - 1
 	setup.CVI = Rnir * Rred / Rgreen / Rgreen
 	setup.SR = Rnir / Rred
+	setup.Rblue=Rblue
+	setup.Rgreen=Rgreen
+	setup.Rred=Rred
+	setup.Rnir=Rnir
+	setup.Rrededge=Rrededge
 
 	return setup
 
