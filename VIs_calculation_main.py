@@ -11,33 +11,35 @@ import pandas as pd
 import datetime
 import VIs_calculation_func
 
-# ## calculate VIs
-# filepath = r'D:\Data\shangqiu data\shang\Results_HRdata_recal\REF\HR_REF'
-# files = os.listdir(filepath)
-# savepath = r'D:\Data\shangqiu data\shang\Results_HRdata_recal\VI_HR_addMTVI2'
+## calculate VIs
+filepath = r'D:\Data\shangqiu data\shang\Results_HRdata_recal\REF\HR_REF'
+files = os.listdir(filepath)
+savepath = r'D:\Data\shangqiu data\shang\Results_HRdata_recal\VI_HR_addMTVI2'
 
-# for file in files:
-#     data = pd.ExcelFile(filepath + '/' + file)
-#     data = data.parse('Sheet1')
-#     wl = data.columns[5:].values
-#     refdata = data.iloc[:, 5:]
-#     timedata = data.iloc[:, 1:5]
-#     matlab_datenum = data.iloc[:, 4].values
-#     python_datetime = map(lambda x: datetime.datetime.fromordinal(
-# 	    int(x) - 366) + datetime.timedelta(days=x % 1), matlab_datenum)
-#     # 因为matlab是从公元0年开始计算的，公元0年是一个闰年，因此需要减去366天
-#     timedata.iloc[:,3]=list(python_datetime)
-#     setup=VIs_calculation_func.get_vegetation_indices(wl,refdata)
-#     # save VIs data
-#     datestr=file[4:12]
-#     columns=['hour','min','sec','datetime','NDVI','EVI','MTCI','MTVI2'
-#     ,'PRI','greenNDVI','rededgeNDVI','CIgreen','CVI','SR']
-#     savedata=pd.DataFrame((np.vstack([timedata.values.T,setup.NDVI,setup.EVI,
-#     	setup.MTCI,setup.MTVI2,setup.PRI,setup.greenNDVI,setup.rededgeNDVI,
-#         setup.CIgreen,setup.CVI,setup.SR]).T),columns=columns)
-#     # print(savedata.shape)
-#     savedata.to_csv(savepath+'/VIs_'+datestr+'.csv',index=False,header=True)
-#     print(datestr+' is ok...')
+for file in files:
+    data = pd.ExcelFile(filepath + '/' + file)
+    data = data.parse('Sheet1')
+    wl = data.columns[5:].values
+    refdata = data.iloc[:, 5:]
+    timedata = data.iloc[:, 1:5]
+    matlab_datenum = data.iloc[:, 4].values
+    python_datetime = map(lambda x: datetime.datetime.fromordinal(
+	    int(x) - 366) + datetime.timedelta(days=x % 1), matlab_datenum)
+    # 因为matlab是从公元0年开始计算的，公元0年是一个闰年，因此需要减去366天
+    timedata.iloc[:,3]=list(python_datetime)
+    setup=VIs_calculation_func.get_vegetation_indices(wl,refdata)
+    # save VIs data
+    datestr=file[4:12]
+    columns=['hour','min','sec','datetime','NDVI','EVI','MTCI','MTVI2'
+    ,'PRI','greenNDVI','rededgeNDVI','CIgreen','CVI','SR','ref_blue',
+    'ref_green','ref_red','ref_nir','ref_rededge']
+    savedata=pd.DataFrame((np.vstack([timedata.values.T,setup.NDVI,setup.EVI,
+    	setup.MTCI,setup.MTVI2,setup.PRI,setup.greenNDVI,setup.rededgeNDVI,
+        setup.CIgreen,setup.CVI,setup.SR,setup.Rblue,setup.Rgreen,setup.Rred,
+        setup.Rnir,setup.Rrededge]).T),columns=columns)
+    # print(savedata.shape)
+    savedata.to_csv(savepath+'/VIs_'+datestr+'.csv',index=False,header=True)
+    print(datestr+' is ok...')
 
 # calculate halfhourly mean and daymean VIs
 filepath = r'D:\Data\shangqiu data\shang\Results_HRdata_recal\VI_HR_addMTVI2'
@@ -72,13 +74,12 @@ for file in files:
 
 ## save halfhourly and daymean VIS
 columns=['doy','hour','NDVI','EVI','MTCI','MTVI2'
-    ,'PRI','greenNDVI','rededgeNDVI','CIgreen','CVI','SR']
+    ,'PRI','greenNDVI','rededgeNDVI','CIgreen','CVI','SR','ref_blue',
+    'ref_green','ref_red','ref_nir','ref_rededge']
 temp=pd.DataFrame(Half,columns=columns)
-temp.to_csv(savepath+'/'+'VI_HR_addMTVI2_halfhourlymean.csv',index=False,header=True)
+temp.to_csv(savepath+'/'+'VI_ref_addMTVI2_halfhourlymean.csv',index=False,header=True)
 columns=['doy','NDVI','EVI','MTCI','MTVI2'
-    ,'PRI','greenNDVI','rededgeNDVI','CIgreen','CVI','SR']
+    ,'PRI','greenNDVI','rededgeNDVI','CIgreen','CVI','SR','ref_blue',
+    'ref_green','ref_red','ref_nir','ref_rededge']
 temp=pd.DataFrame(Daymean,columns=columns)
-temp.to_csv(savepath+'/'+'VI_HR_addMTVI2_dailymean.csv',index=False,header=True)
-
-
-
+temp.to_csv(savepath+'/'+'VI_ref_addMTVI2_dailymean.csv',index=False,header=True)
