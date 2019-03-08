@@ -11,7 +11,7 @@ import numpy as np
 import pandas as pd
 import math
 import datetime
-import matplotlib.pyplot as plt 
+import matplotlib.pyplot as plt
 
 ticklabelsize = 14
 axis_font = {'fontname': 'Arial', 'size': 14}
@@ -55,7 +55,7 @@ def plot_xy(x, y, xlabel, ylabel, axs):
     r2 = '%.2f' % np.square(r)
     text_line = 'y=' + '%.2f' % a + 'x' + '+' + '%.2f' % b
     text_rsqu = '$R^2$= ' + r2 + funcstar(p)
-    axs.scatter(x, y, edgecolors='k',
+    axs.scatter(x, y, marker='.',edgecolors='k',
                 facecolors='', label=text_rsqu)
     axs.plot(x, pred_y, label=text_line, color='k')
     axs.set_xlabel(xlabel, **axis_font)
@@ -99,22 +99,24 @@ def get_par(date_data, lon, lat):
 
     So = 1367  # unit W/m2
     phi = lat
-    sza = 180 * math.asin(abs(math.sin(phi / 180 * np.pi)*math.sin(delta / 180 * np.pi)
-                         + math.cos(phi / 180 * np.pi)*math.cos(delta / 180 * np.pi)*math.cos(t / 180 * np.pi)))
+    sza = math.degrees( math.asin(abs(math.sin(phi / 180 * np.pi) * math.sin(delta / 180 * np.pi)
+                              + math.cos(phi / 180 * np.pi) * math.cos(delta / 180 * np.pi) * math.cos(
+        t / 180 * np.pi))))
     sza = 90 - sza
-    Ro = So * (1 + 0.033 * math.cos(360 * N / 365))*math.cos(sza/180*np.pi)
+    Ro = So * (1 + 0.033 * math.cos(360 * N / 365)) * math.cos(sza / 180 * np.pi)
     return Ro
 
-def get_rmse_rrmse(targets,predictions):
+
+def get_rmse_rrmse(targets, predictions):
     """
     计算均方根误差,相对均方根误差
     """
-    rmse=np.sqrt(((predictions-targets)**2).mean())
-    rrmse=rmse/np.nanmean(targets)
-    return rmse,rrmse
+    rmse = np.sqrt(((predictions - targets) ** 2).mean())
+    rrmse = rmse / np.nanmean(targets)
+    return rmse, rrmse
 
 
-def heatmap(data, text,row_labels, col_labels, ax=None, rotation=0,cbar_kw={}, cbarlabel="", **kwargs):
+def heatmap(data, text, row_labels, col_labels, ax=None, rotation=0, cbar_kw={}, cbarlabel="", **kwargs):
     """
     Create a heatmap from a numpy array and two lists of labels.
 
@@ -162,17 +164,18 @@ def heatmap(data, text,row_labels, col_labels, ax=None, rotation=0,cbar_kw={}, c
     for edge, spine in ax.spines.items():
         spine.set_visible(False)
 
-    ax.set_xticks(np.arange(data.shape[0]+1)-.5, minor=True)
-    ax.set_yticks(np.arange(data.shape[1]+1)-.5, minor=True)
+    ax.set_xticks(np.arange(data.shape[0] + 1) - .5, minor=True)
+    ax.set_yticks(np.arange(data.shape[1] + 1) - .5, minor=True)
     ax.grid(which="minor", color="w", linestyle='-', linewidth=1)
     ax.tick_params(which="minor", bottom=False, left=False)
 
     for i in range(data.shape[0]):
         for j in range(data.shape[1]):
             text = ax.text(j, i, '%.2f' % data.iloc[
-                        i, j], ha='center', va='center', color='w')
+                i, j], ha='center', va='center', color='w')
 
     return im, cbar
+
 
 def get_matlab2py_doy(mattime):
     '''
@@ -183,3 +186,78 @@ def get_matlab2py_doy(mattime):
         int(mattime) - 366) + datetime.timedelta(days=mattime % 1)
     doy = python_datetime.timetuple().tm_yday + mattime % 1
     return doy
+
+
+def get_solar_zenith_angle(lon, lat, doy, time):
+    '''
+    计算太阳天定角SZA（太阳高度角与SZA互补）
+    :param lon: longitude, unit degree
+    :param lat: latitude, unit degree
+    :param doy: day of year, intger
+    :param time: clock time in the current day, unit h
+    :return: sza, solar zenith angle
+    -----------
+    sin(sza) = sin(φ) * sin(δ) + cos(φ) * cos(δ) * cos(t)
+    sza stands for solar alittude, namely what we need;
+
+    φ stands for latitude;
+    δ stands for solar declination;
+    t stands for hour angle.
+    δ=0.006918-0.399912*cos(b)+0.070257*sin(b)-0.006758*cos(2*b)+0.000907*sin(2*b)-0.002697*cos(3*b)+0.00148*sin(3*b)
+    where b=2*pi*(N-1)/365 ,N is the day length between date and Jan. 1st.
+    (0101--> N=1; 0102-->N=2; ...); pi is π.
+    t=(realt -12)*15°
+    realt : true solar time or real solar time
+    realt=meant+ equationt
+    meant : mean solar time
+    equationt: equation of time
+    '''
+    meant = time
+    equationt = (120 - lon) / 15
+    realt = meant + equationt
+    t = (realt - 12) * 15
+    N = doy
+    b = 2 * np.pi * (N - 1) / 365
+    delta = 0.006918 - 0.399912 * math.cos(b) + 0.070257 * math.sin(b) - 0.006758 * math.cos(
+        2 * b) + 0.000907 * math.sin(2 * b) - 0.002697 * math.cos(3 * b) + 0.00148 * math.sin(3 * b)
+
+    phi = lat
+    sza = math.degrees(math.asin(abs(math.sin(phi / 180 * np.pi) * math.sin(delta / 180 * np.pi)
+                              + math.cos(phi / 180 * np.pi) * math.cos(delta / 180 * np.pi) * math.cos(
+        t / 180 * np.pi))))
+    sza = 90 - sza
+
+    return sza
+
+def make_patch_spines_invisible(ax):
+    ax.set_frame_on(True)
+    ax.patch.set_visible(False)
+    for sp in ax.spines.values():
+        sp.set_visible(False)
+
+def plot_shade(host,x,mean_y1,mean_y2,std_y1,std_y2,legendlabel1,legendlabel2,marker1,marker2,c1,c2):
+    par=host.twinx()
+    p1, = host.plot(x, mean_y1, color=c1, linestyle='-',
+                    marker=marker1, label=legendlabel1)
+    p2, = par.plot(x, mean_y2, color=c2, linestyle='-',
+                    marker=marker2, label=legendlabel2)
+    host.fill_between(x, mean_y1 + std_y1, mean_y1 - std_y1,
+                      facecolor=p1.get_color(), alpha=0.3)
+    par.fill_between(x, mean_y2 + std_y2, mean_y2 - std_y2,
+                      facecolor=p2.get_color(), alpha=0.3)
+
+    host.yaxis.label.set_color(p1.get_color())
+    par.yaxis.label.set_color(p2.get_color())
+
+    tkw = dict(size=4, width=1.5)
+    host.tick_params(axis='y', colors=p1.get_color(), **tkw)
+    par.tick_params(axis='y', colors=p2.get_color(), **tkw)
+    host.tick_params(axis='x', **tkw)
+
+    lines = [p1, p2]
+
+    host.legend(lines, [l.get_label() for l in lines])
+
+    # plt.title(savefilename)
+    # plt.savefig(savefilename, dpi=200)
+    return host,par
