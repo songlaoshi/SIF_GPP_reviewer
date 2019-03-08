@@ -15,3 +15,5 @@ data = pd.ExcelFile(
     filepath + '\\' + r'GPP_VPD_Ta_Tleaf_PAR_APAR_norain_SIF_VI_NIRv_CI_SIFyield_LUE_halfhour.xlsx')
 daymean = data.parse('Sheet1')
 daymean = daymean.dropna()
+
+# 
