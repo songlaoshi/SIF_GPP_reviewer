@@ -1,0 +1,10 @@
+原始数据 SIF_GPP_VI_ref_halfhourmean_sq2017corn.xlsx
+
+(1) 删除 植被指数NDVI-radiance_rededge, doy=263.625处所有数据，异常值
+(2) 删除 植被指数NDVI之后所有列， doy=250.4167处所有数据，异常值
+(3) 删除 植被指数EVI,MTVI2, 反射率ref_blue-ref_rededge， doy=197.375-198.6458333 以及doy=199.4583333
+的所有数据，异常值
+(4) 删除 3FLDSIFyield-LUE, doy=192.5833，277.6666667, 处所有数据，异常值
+(5) 删除 LUE, doy=269.5625, 276.6458333, 280.6666667处 数据，异常值
+(6) 删除 3FLDSIFyield-SFMSIFyield, doy=205.4791667处 数据，异常值
+(7) 增加三列：APARgndvi, SIFyieldgndvi, LUEgndvi （greenNDVI=fPAR计算得出）
