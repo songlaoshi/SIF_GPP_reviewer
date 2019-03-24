@@ -1,6 +1,6 @@
 path='D:\Shared_Folder\Lzh py\SifAnalysis\SIF_GPP_reviewer\data';
 [data,text]=xlsread([path '\SIF_GPP_VI_ref_halfhourmean_sq2017corn.xlsx']);
-addpath('D:\Shared_Folder\Lzh py\SifAnalysis\SIF_GPP_reviewer\matlab code');
+addpath('D:\Shared_Folder\Lzh py\SifAnalysis\SIF_GPP_reviewer\matlab_code');
 
 gpp=data(:,3);
 sif=data(:,11);
